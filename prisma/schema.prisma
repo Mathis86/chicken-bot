@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model RegisteredChannels {
+  id             BigInt    @id @default(autoincrement())
+  guildId        String    @unique
+  channelId      String
+  savedChicken   Chickens? @relation(fields: [savedChickenId], references: [id])
+  savedChickenId Int?
+  savedMessageId String?
+  savedStartTime DateTime?
+}
+
+model Chickens {
+  id                 Int                  @id
+  name               String               @unique
+  value              Int
+  imageName          String?
+  emojiId            String?
+  minutesBetweenEggs Int
+  userChickens       UserChickens[]
+  registeredChannels RegisteredChannels[]
+}
+
+model UserChickens {
+  id            BigInt   @id @default(autoincrement())
+  userDiscordId String
+  guildId       String
+  chicken       Chickens @relation(fields: [chickenId], references: [id])
+  chickenId     Int
+  amount        Int      @default(1)
+  nextEggAt     DateTime
+  eggAmount     Int      @default(0)
+
+  @@unique([userDiscordId, guildId, chickenId])
+}
