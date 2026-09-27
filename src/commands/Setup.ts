@@ -2,7 +2,7 @@ import { ChatInputCommandInteraction } from "discord.js";
 import Command from "../classes/Command";
 import DiscordClient from "../classes/DiscordClient";
 
-class SetupCommand extends Command {
+export default class SetupCommand extends Command {
     name: string = "setup";
 
     async execute(client: DiscordClient, interaction: ChatInputCommandInteraction): Promise<void> {
@@ -18,5 +18,3 @@ class SetupCommand extends Command {
         await interaction.reply("Salon setup avec succès")
     }
 }
-
-export default new SetupCommand()

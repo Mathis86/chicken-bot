@@ -5,6 +5,7 @@ export default class ChickensState {
     userName: string
     avatarUrl: string
     isCommandAuthor: boolean
+    expired: boolean = false
 
     constructor(
         interaction: ChatInputCommandInteraction,
@@ -14,14 +15,5 @@ export default class ChickensState {
         this.userName = user.displayName
         this.avatarUrl = user.displayAvatarURL()
         this.isCommandAuthor = user.id === interaction.user.id
-    }
-
-    collectEggs() {
-        let totalEggs = 0
-        for (const userChicken of this.userChickens) {
-            userChicken.nextEggAt = new Date(Date.now() + userChicken.chicken.minutesBetweenEggs * 60_000)
-            totalEggs += userChicken.amount
-        }
-        return totalEggs
     }
 }

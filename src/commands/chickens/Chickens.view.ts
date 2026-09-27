@@ -33,9 +33,9 @@ export default function getChickensComponents(state: ChickensState) {
         const msSinceLastEgg = msBetweenEggs - msBeforeNextEgg
         const progressBar = getProgressBar(msSinceLastEgg, msBetweenEggs)
 
-        let eggInfos = `-# Oeuf${userChicken.amount > 1 ? "s" : ""} dans ${progressBar} ${formatTimeRemaining(msBeforeNextEgg)}`
+        let eggInfos = `-# ${userChicken.amount} oeuf${userChicken.amount > 1 ? "s" : ""} dans ${progressBar} ${formatTimeRemaining(msBeforeNextEgg)}`
         if (msBeforeNextEgg === 0) {
-            eggInfos = `-# Oeuf${userChicken.amount > 1 ? "s" : ""} prêt${userChicken.amount > 1 ? "s" : ""} ! ${progressBar}`
+            eggInfos = `-# ${userChicken.amount} oeuf${userChicken.amount > 1 ? "s" : ""} prêt${userChicken.amount > 1 ? "s" : ""} ! ${progressBar}`
             canLootEggs = true
         }
 
@@ -49,13 +49,20 @@ export default function getChickensComponents(state: ChickensState) {
     if (!state.isCommandAuthor) return [container]
 
     // Boutons
-    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    const row = new ActionRowBuilder<ButtonBuilder>().setComponents(
         new ButtonBuilder()
             .setCustomId('eggs')
             .setEmoji('🥚')
             .setLabel('Récupérer tous les oeufs')
             .setStyle(!canLootEggs ? ButtonStyle.Secondary : ButtonStyle.Success)
-            .setDisabled(!canLootEggs)
+            .setDisabled(!canLootEggs || state.expired),
+
+        new ButtonBuilder()
+            .setCustomId('refresh')
+            .setEmoji('🔁')
+            .setLabel('Rafraîchir')
+            .setStyle(ButtonStyle.Secondary)
+            .setDisabled(state.expired)
     )
 
     return [container, row]
@@ -95,5 +102,5 @@ function formatTimeRemaining(remainingMs: number): string {
         return `${seconds} sec`;
     }
 
-    return `${minutes} min et ${seconds} sec`;
+    return `${minutes} min`;
 }

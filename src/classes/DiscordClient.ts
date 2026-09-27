@@ -48,7 +48,10 @@ export default class DiscordClient extends Client {
      */
     loadCommands() {
         readFilesAndForEach('commands', (filePath) => {
-            const command = require(filePath).default
+            const commandClass = require(filePath).default
+            if (!(commandClass.prototype instanceof Command)) return
+            
+            const command = new commandClass()
             if (command instanceof Command) {
                 this.commands.set(command.name, command)
             }

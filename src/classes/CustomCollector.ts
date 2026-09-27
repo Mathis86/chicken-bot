@@ -2,12 +2,18 @@ import { CollectedMessageInteraction, InteractionCollector, InteractionResponse,
 
 type RouteFn<T extends CollectedMessageInteraction> = (interaction: T, ...params: string[]) => Promise<void> | void
 
+type Options = {
+    userId?: string, 
+    errorMessage?: string,
+    idle?: number
+}
+
 export default class CustomCollector {
     collector: InteractionCollector<CollectedMessageInteraction>
     private routesMap = new Map<string, RouteFn<any>>()
 
-    constructor(message: InteractionResponse, userId?: string, errorMessage?: string) {
-        this.collector = message.createMessageComponentCollector()
+    constructor(message: InteractionResponse, { idle = 60_000, userId, errorMessage }: Options ) {
+        this.collector = message.createMessageComponentCollector({ idle })
 
         this.collector.on('collect', async (interaction) => {
             if (userId && interaction.user.id !== userId) {
@@ -31,6 +37,11 @@ export default class CustomCollector {
 
     addRoute<T extends CollectedMessageInteraction>(name: string, fn: RouteFn<T>): this {
         this.routesMap.set(name, fn as RouteFn<any>)
+        return this
+    }
+
+    onEnd(fn: () => Promise<void> | void): this {
+        this.collector.once('end', () => fn()?.catch(console.error))
         return this
     }
 }

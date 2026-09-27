@@ -5,7 +5,7 @@ import ChickensState from "./Chickens.state";
 import getChickensComponents, { getEggsComponent } from "./Chickens.view";
 import CustomCollector from "../../classes/CustomCollector";
 
-class ChickensCommand extends Command {
+export default class ChickensCommand extends Command {
     name: string = "chickens";
 
     async execute(client: DiscordClient, interaction: ChatInputCommandInteraction): Promise<void> {
@@ -27,36 +27,45 @@ class ChickensCommand extends Command {
             return
         }
         
-        const state = new ChickensState(interaction, user, userChickens)
-        const components = getChickensComponents(state)
+        let state = new ChickensState(interaction, user, userChickens)
 
         const response = await interaction.reply({
-            components,
+            components: getChickensComponents(state),
             flags: MessageFlags.IsComponentsV2
         })
 
         // Rien à collecter si le joueur consulte l'inventaire d'un autre
         if (!state.isCommandAuthor) return
             
-        new CustomCollector(response, interaction.user.id, "Tu ne peux pas voler les oeufs de tes camarades...\n-# (Pas encore... ça reste entre nous)")
+        new CustomCollector(response, {
+            userId: interaction.user.id,
+            errorMessage: "Tu ne peux pas voler les oeufs de tes camarades...\n-# (Pas encore... ça reste entre nous)"
+        })
             // Bouton "Récupérer tous les oeufs"
-            .addRoute<ButtonInteraction>('eggs', async (interaction) => {
+            .addRoute<ButtonInteraction>('eggs', async (i) => {
                 const collectedEggs = await client.services.chicken.collectAllEggs(guildId, user.id)
 
                 const newUserChickens = await client.services.chicken.getByUserAndGuild(guildId, user.id)
                 state.userChickens = newUserChickens
 
-                await interaction.update({
+                await i.update({
                     components: getChickensComponents(state)
                 })
 
-                await interaction.followUp({
+                await i.followUp({
                     components: [getEggsComponent(collectedEggs)],
                     flags: [MessageFlags.Ephemeral, MessageFlags.IsComponentsV2]
                 })
             })
+            // Bouton rafraichir
+            .addRoute<ButtonInteraction>('refresh', async (i) => {
+                const userChickens = await client.services.chicken.getByUserAndGuild(guildId, user.id)
+                state = new ChickensState(interaction, i.user, userChickens)
+                await i.update({ components: getChickensComponents(state) })
+            })
+            .onEnd(async () => {
+                state.expired = true
+                await interaction.editReply({ components: getChickensComponents(state) })
+            })
     }
-
 }
-
-export default new ChickensCommand()
