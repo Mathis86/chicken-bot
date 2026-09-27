@@ -1,4 +1,4 @@
-import { OmitPartialGroupDMChannel, Message } from "discord.js";
+import { OmitPartialGroupDMChannel, Message, ChannelType } from "discord.js";
 import DiscordClient from "../classes/DiscordClient";
 import Event from "../classes/Event";
 import emojis from "../../datas/emojis";
@@ -7,7 +7,9 @@ export default class MessageCreateEvent extends Event<"messageCreate"> {
     name: "messageCreate" = "messageCreate";
 
     async execute(client: DiscordClient, message: OmitPartialGroupDMChannel<Message<boolean>>): Promise<void> {
-        if (message.author.bot) return
+        // S'assure que le message ne provienne pas d'un bot 
+        // Ou qu'il ne soit pas le message initial d'un thread (utile pour les forums)
+        if (message.author.bot || message.id === message.channelId) return
 
         const containsTriggerWord = (text: string) => {
             for (const trigger of ['chicken', 'poule', 'poulet']) {
