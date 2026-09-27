@@ -7,7 +7,9 @@ export default class RegisteredChannelService {
     ) {}
 
     async getAll() {
-        return await this.client.prisma.registeredChannels.findMany()
+        return await this.client.prisma.registeredChannels.findMany({
+            include: { savedChicken: true }
+        })
     }
 
     async getByGuildId(guildId: string) {
@@ -17,19 +19,11 @@ export default class RegisteredChannelService {
     }
 
     /**
-     * Synchronise toutes les guilds dans lequel le bot est présent avec la DB.
+     * Supprime tous les serveurs enregistrés dans lesquels le bot n'est plus présent
      * Utile au démarrage du bot dans le cas d'un crash.
      */
-    async sync() {
-        const registeredChannels = await this.getAll()
+    async clearOldGuilds() {
         const guildIds = Array.from(this.client.guilds.cache.values()).map(g => g.id)
-
-        // Enregistrement des channels non présents dans la DB
-        guildIds.forEach(guildId => {
-            if (!registeredChannels.find(r => r.guildId === guildId)) {
-                this.setFirstValidChannel(guildId)
-            }
-        })
 
         // Suppression des channels où le bot n'est plus présent
         await this.client.prisma.registeredChannels.deleteMany({
@@ -39,51 +33,26 @@ export default class RegisteredChannelService {
     
     /**
      * Ajoute le channel de spawn d'un serveur dans la DB.
+     * Démarre le spawner.
      */
-    async set(guildId: string, channelId: string) {
+    async setup(guildId: string, channelId?: string) {
         await this.client.prisma.registeredChannels.upsert({
             create: { guildId, channelId },
             update: { channelId },
             where: { guildId }
         })
+        if (channelId) this.client.chickenSpawnScheduler.startForGuild(guildId)
     }
 
     /**
-     * Retire le channel de spawn d'un serveur de la DB
+     * Retire le channel de spawn d'un serveur de la DB.
+     * Arrête le spawner.
      */
-    async remove(channelId: string) {
+    async forget(guildId: string) {
         await this.client.prisma.registeredChannels.deleteMany({
-            where: { channelId }
+            where: { guildId }
         })
-    }
-
-    /**
-     * Ajoute le premier channel valide d'un serveur dans la DB
-     * Retourne l'id du channel paramétré, ou null si pas trouvé
-     */
-    async setFirstValidChannel(guildId: string) {
-        // Si le bot n'a pas de "user", ça ne sert à rien de faire quoi que ce soit
-        if (!this.client.user) return null
-
-        const channels = await this.client.guilds.cache.get(guildId)?.channels.fetch()
-
-        if (!channels) return null
-
-        // On prend le premier channel dans lequel le bot peut écrire
-        for (const channel of channels.values()) {
-            if (!channel) continue
-            const permissions = channel.permissionsFor(this.client.user)
-
-            // Si on ne peut pas envoyer de message dans ce channel ou que le bot n'a pas la permission d'envoyer de message, on skip
-            if (!channel.isSendable() || !permissions || !permissions.has(PermissionFlagsBits.SendMessages)) continue
-
-            // On setup le premier channel qui est OK
-            await this.set(guildId, channel.id)
-
-            return channel.id;
-        }
-
-        return null
+        this.client.chickenSpawnScheduler.stopForGuild(guildId)
     }
 
     /**

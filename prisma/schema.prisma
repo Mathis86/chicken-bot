@@ -13,13 +13,14 @@ datasource db {
 }
 
 model RegisteredChannels {
-  id             BigInt    @id @default(autoincrement())
-  guildId        String    @unique
-  channelId      String
-  savedChicken   Chickens? @relation(fields: [savedChickenId], references: [id])
-  savedChickenId Int?
-  savedMessageId String?
-  savedStartTime DateTime?
+  id                 BigInt    @id @default(autoincrement())
+  guildId            String    @unique
+  channelId          String?
+  savedChicken       Chickens? @relation(fields: [savedChickenId], references: [id])
+  savedChickenId     Int?
+  savedMessageId     String?
+  savedStartTime     DateTime?
+  savedRemainingTime DateTime?
 }
 
 model Chickens {

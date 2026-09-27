@@ -14,7 +14,7 @@ export default class SetupCommand extends Command {
             return
         }
 
-        await client.services.registeredChannel.set(guildId, channelId)
-        await interaction.reply("Salon setup avec succès")
+        await client.services.registeredChannel.setup(guildId, channelId)
+        await interaction.reply("Salon setup avec succès !\n-# *Une poule devrait apparaître d'ici 1 à 10 minutes...*")
     }
 }

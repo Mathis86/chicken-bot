@@ -6,12 +6,19 @@ export default class MessageService {
         private readonly client: DiscordClient
     ) {}
 
-    async sendWelcome(channelId: string) {
-        await this.trySend(channelId, "Merci d'avoir invité le bot :)\nIl est conseillé de créer un channel dédié et d'y faire \`/setup\` si vous voulez que les poules apparaissent la-bas\nSinon, elles apparaitront ici")
-    }
+    async sendWelcome(guildId: string) {
+        const channels = await this.client.guilds.cache.get(guildId)?.channels.fetch()
 
-    async sendChicken(channelId: string) {
-        return await this.trySend(channelId, "Voici une poule. Écris \"ckn\" pour la capturer.")
+        if (!channels) return
+
+        // On prend le premier channel dans lequel le bot peut écrire
+        for (const channel of channels.values()) {
+            if (!channel || !this.canWriteInChannel(channel)) continue
+            
+            await channel.send("Merci d'avoir invité le bot :)\nFaites \`/setup\` pour que les poules commencent à apparaître !\n-# *Dans un channel dédié c'est mieux ;)*")
+                .catch(console.error)
+            break;
+        }
     }
 
     canWriteInChannel(channel: Channel): channel is GuildTextBasedChannel {
@@ -23,13 +30,5 @@ export default class MessageService {
         if (!permissions?.has(PermissionFlagsBits.SendMessages)) return false
 
         return true
-    }
-
-    private async trySend(channelId: string, message: string) {
-        const channel = await this.client.channels.fetch(channelId)
-        if (channel && this.canWriteInChannel(channel)) {
-            return await channel.send(message).catch(console.error)
-        }
-        return null
     }
 }

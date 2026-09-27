@@ -1,9 +1,11 @@
 import { GuildTextBasedChannel, Message, MessageCollector } from "discord.js"
 import DiscordClient from "../classes/DiscordClient"
 import { getAttachmentByImagename } from "../utils"
-import { Chickens } from "../../prisma/generated/client"
+import { Chickens, Prisma } from "../../prisma/generated/client"
 
 export default class SpawnService {
+    private channelsCollectors = new Map<string, MessageCollector>()
+
     constructor(
         private readonly client: DiscordClient
     ) {}
@@ -34,7 +36,7 @@ export default class SpawnService {
         }
         else {
             console.log(`Le bot n'a pas pu écrire dans le channel ${channelId}. Déserengistrement de la BDD...`)
-            await this.client.services.registeredChannel.remove(channelId)
+            await this.client.services.registeredChannel.forget(channelId)
         }
     }
 
@@ -45,18 +47,22 @@ export default class SpawnService {
         const emojiId = chicken.emojiId ? (chicken.emojiId + " ") : ""
 
         if (chicken.rate < 0.01) return `# OMGGGG !!!!!!!!!!\n**UNE ${emojiId}${chicken.name.toUpperCase()} VIENT D'APPARAÎTRE !!!**\n**ÉCRIS VITE "CKN" POUR LA CAPTURER !!!**`
-        if (chicken.rate < 0.05) return `**WOAH**, une ${emojiId}**${chicken.name}** vient d'apparaître !!\nÉcris "ckn" pour la capturer !`
-        if (chicken.rate < 0.1) return `Ohhh pas mal, une ${emojiId}**${chicken.name}** vient d'apparaître !\nÉcris "ckn" pour la capturer !`
-        if (chicken.rate < 0.2) return `Une ${emojiId}**${chicken.name}** vient d'apparaître, on la voit pas souvent celle-là.\nÉcris "ckn" pour la capturer !`
-        return `Une ${emojiId}**${chicken.name}** vient d'apparaître.\nÉcris "ckn" pour la capturer !`
+        if (chicken.rate < 0.05) return `**WOAH**, une ${emojiId}**${chicken.name}** vient d'apparaître !!\n-# *Écris "ckn" pour la capturer !*`
+        if (chicken.rate < 0.1) return `Ohhh pas mal, une ${emojiId}**${chicken.name}** vient d'apparaître !\n-# *Écris "ckn" pour la capturer !*`
+        if (chicken.rate < 0.2) return `Une ${emojiId}**${chicken.name}** vient d'apparaître, on la voit pas souvent celle-là.\n-# *Écris "ckn" pour la capturer !*`
+        return `Une ${emojiId}**${chicken.name}** vient d'apparaître.\n-# *Écris "ckn" pour la capturer !*`
     }
 
     /**
      * Collector qui attend qu'un joueur capture la poule
      */
     private async createCollector(channel: GuildTextBasedChannel, chickenMessage: Message, startTime: number, chicken: Chickens) {
+        // Si un collector existe déjà, on le stop
+        this.channelsCollectors.get(channel.guildId)?.stop()
+
         // Collecter les réponses et attendre "ckn" pour valider la capture
         const collector = channel.createMessageCollector()
+        this.channelsCollectors.set(channel.guildId, collector)
 
         collector.on("collect", async (message) => {
             try {
@@ -73,7 +79,6 @@ export default class SpawnService {
                     // Ajout de la poule à l'utilisateur dans la DB
                     await this.client.services.chicken.addToUser(guildId, userId, chicken.id)
 
-                    const timeToCatch = ((Date.now() - startTime) / 1000).toFixed(1)
                     collector.stop()
 
                     // Suppression du message de la poule
@@ -81,36 +86,38 @@ export default class SpawnService {
 
                     if (message.channel.isSendable()) {
                         const emojiId = chicken.emojiId ? (chicken.emojiId + " ") : ""
-                        await message.channel.send(`<@${userId}> a capturé la ${emojiId}**${chicken.name}** en \`${timeToCatch}\` secondes !!`)
+                        await message.channel.send(`<@${userId}> a capturé la ${emojiId}**${chicken.name}** en ${timeToCatchFormat(Date.now() - startTime)} !!`)
                     }
 
                     // Relancer le scheduler
-                    await this.client.chickenSpawnScheduler.startForGuild(guildId)
+                    this.client.chickenSpawnScheduler.startForGuild(channel.guildId)
                 }
             } catch (error) { console.error(error) }
         })
+
+        function timeToCatchFormat(ms: number) {
+            const date = new Date(ms)
+            const minutes = date.getMinutes()
+            const seconds = date.getSeconds()
+            if (minutes === 0) return `\`${(ms / 1000).toFixed(1)}\` seconde${ms > 1000 ? 's' : ''}`
+            return `\`${minutes}\` minute${minutes > 1 ? 's' : ''} et \`${seconds}\` seconde${seconds > 1 ? 's' : ''}`
+        }
     }
 
     /**
      * Relance d'un collector pour chaque poule sauvegardée en BDD
      */
-    async createCollectorForEachSavedChicken() {
-        const registeredChannels = await this.client.prisma.registeredChannels.findMany({
-            include: { savedChicken: true },
-            where: { savedChicken: { isNot: null }}
-        })
+    async createCollectorForSavedChannel(registeredChannel: Prisma.RegisteredChannelsGetPayload<{ include: { savedChicken: true }}>) {
+        const { savedChicken, savedMessageId, savedStartTime, channelId } = registeredChannel
+        if (!savedChicken || !savedMessageId || !savedStartTime || !channelId) return
 
-        registeredChannels.forEach(async (registeredChannel) => {
-            const channel = await this.client.channels.fetch(registeredChannel.channelId)
-            if (channel && this.client.services.message.canWriteInChannel(channel)) {
-                const { savedChicken, savedMessageId, savedStartTime } = registeredChannel
-                if (!savedChicken || !savedMessageId || !savedStartTime) return
+        const channel = await this.client.channels.fetch(channelId)
+        
+        if (channel && this.client.services.message.canWriteInChannel(channel)) {
+            const message = await channel.messages.fetch(savedMessageId).catch(console.error)
+            if (!message) return
 
-                const message = await channel.messages.fetch(savedMessageId).catch(console.error)
-                if (!message) return
-
-                await this.createCollector(channel, message, savedStartTime.getTime(), savedChicken)
-            }
-        })
+            await this.createCollector(channel, message, savedStartTime.getTime(), savedChicken)
+        }
     }
 }

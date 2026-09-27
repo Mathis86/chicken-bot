@@ -1,41 +1,36 @@
 import Event from "../classes/Event";
 import DiscordClient from "../classes/DiscordClient";
 
-class ClientReady extends Event<"clientReady"> {
+export default class ClientReady extends Event<"clientReady"> {
     once: boolean = true;
     name: "clientReady" = "clientReady";
 
     async execute(client: DiscordClient) {
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Synchronise les channels enregistrés en base avec la réalité
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         const registeredChannels = await client.services.registeredChannel.getAll()
         const guildIds = Array.from(client.guilds.cache.values()).map(g => g.id)
 
-        // Enregistrement des channels non présents dans la DB
-        // Et envoie du message de bienvenue
-        guildIds.forEach(async (guildId) => {
-            try {  
-                if (!registeredChannels.find(r => r.guildId === guildId)) {
-                    const channelId = await client.services.registeredChannel.setFirstValidChannel(guildId)
-                    if (channelId) await client.services.message.sendWelcome(channelId)
-                }
-            } catch (error) { console.error(error) }
+        // Envoie du message de bienvenue dans les serveurs où le bot a été ajouté pendant qu'il était offline
+        guildIds.forEach((guildId) => {
+            const registered = registeredChannels.find(r => r.guildId === guildId)
+
+            // Si le serveur n'est pas dans la DB -> message de bienvenue
+            if (!registered) {
+                client.services.registeredChannel.setup(guildId).catch(console.error)
+                client.services.message.sendWelcome(guildId).catch(console.error)
+            }
+            // S'il est dans la DB, qu'il a setup un channel & pas de poule en attente -> démarrer le spawner
+            else if (registered.channelId && !registered.savedChickenId) {
+                client.chickenSpawnScheduler.startForGuild(registered.guildId)
+            }
+            // Si poule en attente, relancer le collector
+            else {
+                client.services.spawn.createCollectorForSavedChannel(registered)
+            }
         })
 
         // Suppression des channels où le bot n'est plus présent
-        await client.prisma.registeredChannels.deleteMany({
-            where: { guildId: { notIn: guildIds }}
-        })
-
-        // Démarre le spawning de poule pour chaque channel enregistré qui n'a pas déjà une poule en attente
-        await client.chickenSpawnScheduler.startInAllGuilds()
-
-        // Relance le collector pour chaque guild qui avait une poule en attente
-        await client.services.spawn.createCollectorForEachSavedChicken()
+        await client.services.registeredChannel.clearOldGuilds()
 
         console.log("Le bot est prêt !")
     }
 }
-
-export default new ClientReady()

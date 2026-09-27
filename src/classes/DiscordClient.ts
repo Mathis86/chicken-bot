@@ -63,7 +63,10 @@ export default class DiscordClient extends Client {
      */
     loadEvents() {
         readFilesAndForEach('events', (filePath) => {
-            const event = require(filePath).default
+            const eventClass = require(filePath).default
+            if (!(eventClass.prototype instanceof Event)) return
+
+            const event = new eventClass()
             if (event instanceof Event) {
                 if (event.once) this.once(event.name, (...args) => event.execute(this, ...args).catch(console.error))
                 else this.on(event.name, (...args) => event.execute(this, ...args).catch(console.error))
