@@ -48,8 +48,16 @@ export default class RegisteredChannelService {
      * Retire le channel de spawn d'un serveur de la DB.
      * Arrête le spawner.
      */
-    async forget(guildId: string) {
-        await this.client.prisma.registeredChannels.deleteMany({
+    async forgetChannel(guildId: string) {
+        await this.client.prisma.registeredChannels.update({
+            data: { channelId: null },
+            where: { guildId }
+        })
+        this.client.chickenSpawnScheduler.stopForGuild(guildId)
+    }
+
+    async delete(guildId: string) {
+        await this.client.prisma.registeredChannels.delete({
             where: { guildId }
         })
         this.client.chickenSpawnScheduler.stopForGuild(guildId)

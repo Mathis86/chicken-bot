@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, Client, Collection, GatewayIntentBits } from "discord.js";
+import { ChatInputCommandInteraction, Client, Collection, GatewayIntentBits, PermissionFlagsBits } from "discord.js";
 
 import Command from "./Command";
 import CustomPrismaClient from "./CustomPrismaClient";
@@ -79,9 +79,17 @@ export default class DiscordClient extends Client {
      * Ne fait rien si la commande n'existe pas.
      */
     tryToExecuteCommand(interaction: ChatInputCommandInteraction) {
-        const command = this.commands.get(interaction.commandName)
-        if (command) {
-            command.execute(this, interaction).catch(console.error)
+        const commandName = interaction.commandName + (interaction.options.getSubcommand() ? '.' + interaction.options.getSubcommand() : '')
+        
+        const command = this.commands.get(commandName)
+        if (!command) return
+
+        if (command.isAdmin && !interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
+            interaction.reply("C'est une commande admin et visiblement t'es pas admin\n-# *C'est peut-être le moment de soudoyer l'owner...*")
+                .catch(console.error)
+            return
         }
+
+        command.execute(this, interaction).catch(console.error)
     }
 }

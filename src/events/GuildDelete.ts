@@ -6,6 +6,6 @@ export default class GuildDelete extends Event<"guildDelete"> {
     name: "guildDelete" = "guildDelete";
 
     async execute(client: DiscordClient, guild: Guild) {
-        await client.services.registeredChannel.forget(guild.id)
+        await client.services.registeredChannel.delete(guild.id)
     }
 }

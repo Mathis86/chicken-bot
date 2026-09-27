@@ -15,7 +15,7 @@ export default class MessageService {
         for (const channel of channels.values()) {
             if (!channel || !this.canWriteInChannel(channel)) continue
             
-            await channel.send("Merci d'avoir invité le bot :)\nFaites \`/setup\` pour que les poules commencent à apparaître !\n-# *Dans un channel dédié c'est mieux ;)*")
+            await channel.send("Merci d'avoir invité le bot :)\nFaites \`/admin setup\` pour que les poules commencent à apparaître !\n-# *Dans un channel dédié c'est mieux ;)*")
                 .catch(console.error)
             break;
         }
