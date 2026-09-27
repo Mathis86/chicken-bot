@@ -9,8 +9,16 @@ export default class MessageCreateEvent extends Event<"messageCreate"> {
     async execute(client: DiscordClient, message: OmitPartialGroupDMChannel<Message<boolean>>): Promise<void> {
         if (message.author.bot) return
 
+        const containsTriggerWord = (text: string) => {
+            for (const trigger of ['chicken', 'poule', 'poulet']) {
+                if (text.toLowerCase().includes(trigger)) return true
+            }
+            return false
+        }
+
         // Très faible chance de react sous le message d'un utilisateur
-        if (Math.random() < 0.01) {
+        // Ou chance garantie si le message contient un triggerWord
+        if (Math.random() < 0.01 || containsTriggerWord(message.content)) {
             message.react(emojis.WhiteChicken).catch(console.error)
         }
     }
