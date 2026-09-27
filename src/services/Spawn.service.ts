@@ -111,7 +111,7 @@ export default class SpawnService {
         const { savedChicken, savedMessageId, savedStartTime, channelId } = registeredChannel
         if (!savedChicken || !savedMessageId || !savedStartTime || !channelId) return
 
-        const channel = await this.client.channels.fetch(channelId)
+        const channel = await this.client.channels.fetch(channelId).catch(() => null)
         
         if (channel && this.client.services.message.canWriteInChannel(channel)) {
             const message = await channel.messages.fetch(savedMessageId).catch(console.error)

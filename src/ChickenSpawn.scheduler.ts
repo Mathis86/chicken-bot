@@ -29,7 +29,7 @@ export default class ChickenSpawnScheduler {
         const timeout = setTimeout(async () => {
             const registered = await this.client.services.registeredChannel.getByGuildId(guildId)
             if (registered && registered.channelId) this.client.services.spawn.spawnInChannel(registered.channelId).catch(console.error)
-        }, config.isProd ? remainingMs : 3500);
+        }, config.isProd ? remainingMs : 6000);
 
         // Ecraser le timeout existant le cas échéant
         this.guildsTimeouts.get(guildId)?.close()

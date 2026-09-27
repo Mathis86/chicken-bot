@@ -7,6 +7,7 @@ export default class ForgetCommand extends Command {
 
     async execute(client: DiscordClient, interaction: ChatInputCommandInteraction): Promise<void> {
         const guildId = interaction.guildId
+        const channelId = interaction.channelId
 
         if (!guildId) {
             await interaction.reply("`❌` Je sais pas où on est là mais je peux t'assurer que cette commande va pas fonctionner ici\n-# *Essaye la dans un channel textuel normal pour voir ?*")
@@ -25,7 +26,7 @@ export default class ForgetCommand extends Command {
             return
         }
 
-        await client.services.registeredChannel.forgetChannel(guildId)
+        await client.services.registeredChannel.forgetChannel(channelId)
 
         await interaction.reply("`✅` Ce channel a bien été oublié de mes magnifiques bases de données :>\n-# *Plus aucune poule viendra vous embêter ici promis...*")
     }
