@@ -15,7 +15,7 @@ export default class SpawnService {
      * Une fois capturée, relance le scheduler pour la prochaine poule.
      */
     async spawnInChannel(channelId: string) {
-        const channel = await this.client.channels.fetch(channelId)
+        const channel = await this.client.channels.fetch(channelId).catch(() => null)
 
         // Si le channel existe et que le bot peut écrire dedans
         if (channel && this.client.services.message.canWriteInChannel(channel)) {
