@@ -36,7 +36,7 @@ export default class SpawnService {
         }
         else {
             console.log(`Le bot n'a pas pu écrire dans le channel ${channelId}. Déserengistrement de la BDD...`)
-            await this.client.services.registeredChannel.forget(channelId)
+            await this.client.services.registeredChannel.forgetChannel(channelId)
         }
     }
 

@@ -1,3 +1,4 @@
+import { config } from "../config";
 import DiscordClient from "./classes/DiscordClient";
 
 export default class ChickenSpawnScheduler {
@@ -28,7 +29,7 @@ export default class ChickenSpawnScheduler {
         const timeout = setTimeout(async () => {
             const registered = await this.client.services.registeredChannel.getByGuildId(guildId)
             if (registered && registered.channelId) this.client.services.spawn.spawnInChannel(registered.channelId).catch(console.error)
-        }, 3000);
+        }, config.isProd ? remainingMs : 3500);
 
         // Ecraser le timeout existant le cas échéant
         this.guildsTimeouts.get(guildId)?.close()
