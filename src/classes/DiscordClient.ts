@@ -79,7 +79,8 @@ export default class DiscordClient extends Client {
      * Ne fait rien si la commande n'existe pas.
      */
     tryToExecuteCommand(interaction: ChatInputCommandInteraction) {
-        const commandName = interaction.commandName + (interaction.options.getSubcommand() ? '.' + interaction.options.getSubcommand() : '')
+        const subCommandName = interaction.options.getSubcommand(false)
+        const commandName = interaction.commandName + (subCommandName ? '.' + subCommandName : '')
         
         const command = this.commands.get(commandName)
         if (!command) return
