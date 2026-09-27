@@ -10,5 +10,6 @@ const dbUrl = `mysql://${dbUser}:${dbPass}@${dbHost}:3306/${dbName}`
 export const config = {
     botToken: process.env.BOT_TOKEN || "",
     botId: process.env.BOT_ID || "",
-    dbHost, dbUser, dbPass, dbName, dbUrl
+    dbHost, dbUser, dbPass, dbName, dbUrl,
+    isProd: process.env.NODE_ENVIR === "PROD" ? true : false
 }

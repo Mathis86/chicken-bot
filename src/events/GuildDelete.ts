@@ -2,7 +2,7 @@ import { Guild } from "discord.js";
 import DiscordClient from "../classes/DiscordClient";
 import Event from "../classes/Event";
 
-export default class GuildDelete extends Event<"guildDelete"> {
+export default class GuildDeleteEvent extends Event<"guildDelete"> {
     name: "guildDelete" = "guildDelete";
 
     async execute(client: DiscordClient, guild: Guild) {

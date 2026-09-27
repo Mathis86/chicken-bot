@@ -1,7 +1,7 @@
 import Event from "../classes/Event";
 import DiscordClient from "../classes/DiscordClient";
 
-export default class ClientReady extends Event<"clientReady"> {
+export default class ClientReadyEvent extends Event<"clientReady"> {
     once: boolean = true;
     name: "clientReady" = "clientReady";
 
