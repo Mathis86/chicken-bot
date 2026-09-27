@@ -6,7 +6,7 @@ const chickens: Chickens[] = [
         name: "Poule blanche",
         value: 10,
         imageName: "white",
-        emojiId: "<:white:1553139534282231828>",
+        emojiId: "<:white:1553517936105357362>",
         minutesBetweenEggs: 60
     },
     {
@@ -14,7 +14,7 @@ const chickens: Chickens[] = [
         name: "Poule rousse",
         value: 12,
         imageName: "orange",
-        emojiId: "<:orange:1553139531874570272>",
+        emojiId: "<:orange:1553517934163271781>",
         minutesBetweenEggs: 60
     },
     {
@@ -22,7 +22,7 @@ const chickens: Chickens[] = [
         name: "Poule rich millionnaire",
         value: 20,
         imageName: "rich",
-        emojiId: "<:rich:1553139533070204950>",
+        emojiId: "<:rich:1553517935149064242>",
         minutesBetweenEggs: 60
     },
     {
@@ -30,7 +30,7 @@ const chickens: Chickens[] = [
         name: "Poule dorée",
         value: 30,
         imageName: "gold",
-        emojiId: "<:gold:1553139530687578242>",
+        emojiId: "<:gold:1553517932800380989>",
         minutesBetweenEggs: 60
     },
     {
@@ -46,7 +46,7 @@ const chickens: Chickens[] = [
         name: "Poule trou noir",
         value: 100,
         imageName: "blackhole",
-        emojiId: "<:blackhole:1553375080975826994>",
+        emojiId: "<:blackhole:1553517929918636062>",
         minutesBetweenEggs: 60
     },
     {

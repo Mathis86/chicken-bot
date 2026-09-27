@@ -15,7 +15,7 @@ export default class ChickenSpawnScheduler {
         })
     }
 
-    async startForGuild(guildId: string) {
+    startForGuild(guildId: string) {
         const minMilli = 1 * 60_000 // 1 minute
         const maxMilli = 10 * 60_000 // 10 minutes
         const randomTime = Math.floor(Math.random() * (maxMilli - minMilli)) + minMilli

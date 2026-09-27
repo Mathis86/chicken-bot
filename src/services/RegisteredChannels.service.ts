@@ -51,9 +51,9 @@ export default class RegisteredChannelService {
     /**
      * Retire le channel de spawn d'un serveur de la DB
      */
-    async remove(guildId: string) {
-        await this.client.prisma.registeredChannels.delete({
-            where: { guildId }
+    async remove(channelId: string) {
+        await this.client.prisma.registeredChannels.deleteMany({
+            where: { channelId }
         })
     }
 

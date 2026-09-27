@@ -32,6 +32,10 @@ export default class SpawnService {
             // Collecter les réponses et attendre "ckn" pour valider la capture
             await this.createCollector(channel, chickenMessage, startTime, randomChicken)
         }
+        else {
+            console.log(`Le bot n'a pas pu écrire dans le channel ${channelId}. Déserengistrement de la BDD...`)
+            await this.client.services.registeredChannel.remove(channelId)
+        }
     }
 
     /**
