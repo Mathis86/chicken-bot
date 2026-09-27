@@ -96,11 +96,19 @@ export default class SpawnService {
         })
 
         function timeToCatchFormat(ms: number) {
-            const date = new Date(ms)
-            const minutes = date.getMinutes()
-            const seconds = date.getSeconds()
-            if (minutes === 0) return `\`${(ms / 1000).toFixed(1)}\` seconde${ms > 1000 ? 's' : ''}`
-            return `\`${minutes}\` minute${minutes > 1 ? 's' : ''} et \`${seconds}\` seconde${seconds > 1 ? 's' : ''}`
+            const totalSeconds = ms / 1000
+            const hours = Math.floor(totalSeconds / 3600)
+            const minutes = Math.floor((totalSeconds % 3600) / 60)
+            const rawSeconds = totalSeconds % 60
+            const seconds = rawSeconds < 1 ? rawSeconds.toFixed(1) : Math.floor(rawSeconds)
+
+            if (hours > 0) {
+                return `\`${hours}\` heure${hours > 1 ? 's' : ''} et \`${minutes}\` minute${minutes > 1 ? 's' : ''}`
+            }
+            if (minutes > 0) {
+                return `\`${minutes}\` minute${minutes > 1 ? 's' : ''} et \`${seconds}\` seconde${Number(seconds) > 1 ? 's' : ''}`
+            }
+            return `\`${seconds}\` seconde${Number(seconds) > 1 ? 's' : ''}`
         }
     }
 
