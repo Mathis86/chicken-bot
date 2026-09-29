@@ -17,8 +17,8 @@ export default class SpawnService {
     async spawnInChannel(channelId: string) {
         const channel = await this.client.channels.fetch(channelId).catch(() => null)
 
-        // Si le channel existe et que le bot peut écrire dedans
-        if (channel && this.client.services.message.canWriteInChannel(channel)) {
+        // Si le channel existe et que le bot peut écrire dedans et attacher des images
+        if (channel && this.client.services.message.canWriteInChannel(channel) && this.client.services.message.canSendImageInChannel(channel)) {
             const randomChicken = await this.client.services.chicken.getRandom()
 
             const chickenMessage = await channel.send({

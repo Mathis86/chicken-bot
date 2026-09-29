@@ -23,11 +23,28 @@ export default class MessageService {
 
     canWriteInChannel(channel: Channel): channel is GuildTextBasedChannel {
         // Vérifier s'il s'agit bien d'un channel de serveur et qu'on peut écrire dedans
-        if (!channel.isSendable() || channel.isDMBased() || !this.client.user) return false
-        
+        if (!this.isGuildTextBasedChannel(channel) || !this.client.user) return false
+
         // Vérifier que le bot a les perms pour écrire dedans
         const permissions = channel.permissionsFor(this.client.user)
         if (!permissions?.has(PermissionFlagsBits.SendMessages)) return false
+
+        return true
+    }
+
+    canSendImageInChannel(channel: Channel): channel is GuildTextBasedChannel {
+        // Vérifier s'il s'agit bien d'un channel de serveur et qu'on peut écrire dedans
+        if (!this.isGuildTextBasedChannel(channel) || !this.client.user) return false
+
+        // Vérifier que le bot a les perms pour écrire dedans
+        const permissions = channel.permissionsFor(this.client.user)
+        if (!permissions?.has(PermissionFlagsBits.AttachFiles)) return false
+
+        return true
+    }
+
+    private isGuildTextBasedChannel(channel: Channel): channel is GuildTextBasedChannel {
+        if (!channel.isSendable() || channel.isDMBased()) return false
 
         return true
     }

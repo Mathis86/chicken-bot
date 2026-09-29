@@ -10,9 +10,22 @@ export default class SetupCommand extends Command {
     async execute(client: DiscordClient, interaction: ChatInputCommandInteraction): Promise<void> {
         const guildId = interaction.guildId
         const channelId = interaction.channelId
-        
+
         if (!guildId) {
             await interaction.reply(i18n.t('setup:noGuildId', { lng: interaction.locale }))
+            return
+        }
+
+        if (!interaction.channel) {
+            await interaction.reply(i18n.t('setup:noChannel', { lng: interaction.locale }))
+            return
+        }
+
+        const canWrite = client.services.message.canWriteInChannel(interaction.channel)
+        const canSendImage = client.services.message.canSendImageInChannel(interaction.channel)
+        
+        if (!canWrite || !canSendImage) {
+            await interaction.reply(i18n.t('setup:noPermissions', { lng: interaction.locale }))
             return
         }
 

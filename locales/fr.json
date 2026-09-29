@@ -5,7 +5,9 @@
     "setup": {
         "noGuildId": "`❌` Je sais pas où on est là mais je peux t'assurer que cette commande va pas fonctionner ici\n-# *Essaye la dans un channel textuel normal pour voir ?*",
         "alreadySetup": "`❌` Ce channel est déjà setup, tu n'as rien à faire ici t'inquiète\n-# *Tu voulais peut-être faire `/admin forget` ?*",
-        "success": "`✅` Salon setup avec succès !\n-# *Une poule devrait apparaître d'ici 1 à 10 minutes...*"
+        "success": "`✅` Salon setup avec succès !\n-# *Une poule devrait apparaître d'ici 1 à 10 minutes...*",
+        "noChannel": "`❌` Je sais pas pourquoi mais on a pas l'air d'être dans un channel. Tu fais des trucs bizarres...",
+        "noPermissions": "`❌` J'ai pas les droits pour écrire et envoyer des images ici ||imbécile||\n-# *J'ai besoin de \"Envoyer des messages\" et \"Joindre des fichiers\"*"
     },
     "forget": {
         "noGuildId": "`❌` Je sais pas où on est là mais je peux t'assurer que cette commande va pas fonctionner ici\n-# *Essaye la dans un channel textuel normal pour voir ?*",
