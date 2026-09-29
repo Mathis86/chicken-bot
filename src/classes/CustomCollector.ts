@@ -1,4 +1,5 @@
 import { CollectedMessageInteraction, InteractionCollector, InteractionResponse, MessageFlags } from "discord.js";
+import i18n from "../i18n"
 
 type RouteFn<T extends CollectedMessageInteraction> = (interaction: T, ...params: string[]) => Promise<void> | void
 
@@ -18,7 +19,7 @@ export default class CustomCollector {
         this.collector.on('collect', async (interaction) => {
             if (userId && interaction.user.id !== userId) {
                 await interaction.reply({
-                    content: errorMessage || "Tu n'es pas l'auteur de cette commande.",
+                    content: errorMessage || i18n.t("notTheCommandAuthor"),
                     flags: MessageFlags.Ephemeral
                 })
                 return

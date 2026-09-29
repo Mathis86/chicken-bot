@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction } from "discord.js";
 import Command from "../../classes/Command";
 import DiscordClient from "../../classes/DiscordClient";
+import i18n from "../../i18n"
 
 export default class ForgetCommand extends Command {
     name: string = "admin.forget";
@@ -10,24 +11,24 @@ export default class ForgetCommand extends Command {
         const channelId = interaction.channelId
 
         if (!guildId) {
-            await interaction.reply("`❌` Je sais pas où on est là mais je peux t'assurer que cette commande va pas fonctionner ici\n-# *Essaye la dans un channel textuel normal pour voir ?*")
+            await interaction.reply(i18n.t("forget:noGuildId", { lng: interaction.locale }))
             return
         }
 
         const registered = await client.services.registeredChannel.getByGuildId(guildId)
 
         if (!registered || !registered.channelId) {
-            await interaction.reply("`❌` T'as aucun channel de setup, ça sert à rien d'essayer cette commande broski\n-# *Essaye plutôt `/admin setup`, me remercie pas ;)*")
+            await interaction.reply(i18n.t("forget:noSetupChannel", { lng: interaction.locale }))
             return
         }
 
         if (registered.channelId !== interaction.channelId) {
-            await interaction.reply("`❌` Ce channel n'est pas setup, lâche ça\n-# *Essaye plutôt `/admin setup`, me remercie pas ;)*")
+            await interaction.reply(i18n.t("forget:notSetup", { lng: interaction.locale }))
             return
         }
 
         await client.services.registeredChannel.forgetChannel(channelId)
 
-        await interaction.reply("`✅` Ce channel a bien été oublié de mes magnifiques bases de données :>\n-# *Plus aucune poule viendra vous embêter ici promis...*")
+        await interaction.reply(i18n.t("forget:success", { lng: interaction.locale }))
     }
 }

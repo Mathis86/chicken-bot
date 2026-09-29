@@ -1,0 +1,16 @@
+{
+    "common": {
+        "notTheCommandAuthor": "Arrête ça, tu n'es pas l'auteur de cette commande."
+    },
+    "setup": {
+        "noGuildId": "`❌` Je sais pas où on est là mais je peux t'assurer que cette commande va pas fonctionner ici\n-# *Essaye la dans un channel textuel normal pour voir ?*",
+        "alreadySetup": "`❌` Ce channel est déjà setup, tu n'as rien à faire ici t'inquiète\n-# *Tu voulais peut-être faire `/admin forget` ?*",
+        "success": "`✅` Salon setup avec succès !\n-# *Une poule devrait apparaître d'ici 1 à 10 minutes...*"
+    },
+    "forget": {
+        "noGuildId": "`❌` Je sais pas où on est là mais je peux t'assurer que cette commande va pas fonctionner ici\n-# *Essaye la dans un channel textuel normal pour voir ?*",
+        "noSetupChannel": "`❌` T'as aucun channel de setup, ça sert à rien d'essayer cette commande broski\n-# *Essaye plutôt `/admin setup`, me remercie pas ;)*",
+        "notSetup": "`❌` Ce channel n'est pas setup, lâche ça\n-# *Essaye plutôt `/admin setup`, me remercie pas ;)*",
+        "success": "`✅` Ce channel a bien été oublié de mes magnifiques bases de données :>\n-# *Plus aucune poule viendra vous embêter ici promis...*"
+    }
+}

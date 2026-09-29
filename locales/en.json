@@ -1,0 +1,7 @@
+{
+    "setup": {
+        "noGuildId": "`❌` I don't know where we are right now, but I can assure you that this command won't work here\n-# *Why don't you try it in a regular text channel to see?*",
+        "alreadySetup": "`❌` This channel is already set up, you don't need to do anything here, don't worry\n-# *Maybe you meant to type `/admin forget`?*",
+        "success": "`✅` Channel setup successful!\n-# *A chicken should appear within 1 to 10 minutes...*"
+    }
+}
