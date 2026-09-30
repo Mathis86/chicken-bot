@@ -4,6 +4,7 @@ import DiscordClient from "../../classes/DiscordClient";
 import ChickensState from "./Chickens.state";
 import getChickensComponents, { getEggsComponent } from "./Chickens.view";
 import CustomCollector from "../../classes/CustomCollector";
+import i18n from '../../i18n'
 
 export default class ChickensCommand extends Command {
     name: string = "chickens";
@@ -13,15 +14,15 @@ export default class ChickensCommand extends Command {
         const guildId = interaction.guildId
 
         if (!guildId) {
-            await interaction.reply("Cette commande doit être exécutée dans un serveur...")
+            await interaction.reply(i18n.t("chickens:noGuildId", { lng: interaction.locale }))
             return
         }
 
         const userChickens = await client.services.chicken.getByUserAndGuild(guildId, user.id)
 
         if (userChickens.length === 0) {
-            let responseText = `Vous n'avez pas encore de poule...\nAttendez qu'une poule apparaîsse dans le channel dédié et écrivez "ckn" pour la capturer :)`
-            if (user.id !== interaction.user.id) responseText = `**${user.displayName}** n'a pas encore de poule...`
+            let responseText = i18n.t("chickens:noChickens", { lng: interaction.locale })
+            if (user.id !== interaction.user.id) responseText = i18n.t("chickens:noChickensOther", { lng: interaction.locale, username: user.displayName })
 
             await interaction.reply(responseText)
             return
@@ -39,7 +40,7 @@ export default class ChickensCommand extends Command {
             
         new CustomCollector(response, {
             userId: interaction.user.id,
-            errorMessage: "Tu ne peux pas voler les oeufs de tes camarades...\n-# (Pas encore... ça reste entre nous)"
+            errorMessage: i18n.t("chickens:tryToSteal", { lng: interaction.locale })
         })
             // Bouton "Récupérer tous les oeufs"
             .addRoute<ButtonInteraction>('eggs', async (i) => {

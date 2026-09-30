@@ -13,13 +13,13 @@ export default class CustomCollector {
     collector: InteractionCollector<CollectedMessageInteraction>
     private routesMap = new Map<string, RouteFn<any>>()
 
-    constructor(message: InteractionResponse, { idle = 60_000, userId, errorMessage }: Options ) {
-        this.collector = message.createMessageComponentCollector({ idle })
+    constructor(message: InteractionResponse, opt?: Options ) {
+        this.collector = message.createMessageComponentCollector({ idle: opt?.idle || 15 * 60_000 })
 
         this.collector.on('collect', async (interaction) => {
-            if (userId && interaction.user.id !== userId) {
+            if (opt?.userId && interaction.user.id !== opt.userId) {
                 await interaction.reply({
-                    content: errorMessage || i18n.t("notTheCommandAuthor"),
+                    content: opt.errorMessage || i18n.t("notTheCommandAuthor", { lng: interaction.locale }),
                     flags: MessageFlags.Ephemeral
                 })
                 return

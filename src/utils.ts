@@ -15,3 +15,11 @@ export function readFilesAndForEach(folder: string, callback: (filePath: string)
 export function getAttachmentByImagename(name: string): AttachmentBuilder {
     return new AttachmentBuilder(path.join(process.cwd(), 'images', `${name}.png`))
 }
+
+export function getProgressBar(current: number, max: number) {
+    const totalSquares = 10
+    const fullSquares = Math.floor(totalSquares * current / max) 
+    const emptySquares = totalSquares - fullSquares
+
+    return '▰'.repeat(fullSquares) + '▱'.repeat(emptySquares)
+}

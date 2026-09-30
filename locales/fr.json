@@ -1,6 +1,7 @@
 {
     "common": {
-        "notTheCommandAuthor": "Arrête ça, tu n'es pas l'auteur de cette commande."
+        "notTheCommandAuthor": "Arrête ça, tu n'es pas l'auteur de cette commande.",
+        "level": "Niv."
     },
     "setup": {
         "noGuildId": "`❌` Je sais pas où on est là mais je peux t'assurer que cette commande va pas fonctionner ici\n-# *Essaye la dans un channel textuel normal pour voir ?*",
@@ -14,5 +15,17 @@
         "noSetupChannel": "`❌` T'as aucun channel de setup, ça sert à rien d'essayer cette commande broski\n-# *Essaye plutôt `/admin setup`, me remercie pas ;)*",
         "notSetup": "`❌` Ce channel n'est pas setup, lâche ça\n-# *Essaye plutôt `/admin setup`, me remercie pas ;)*",
         "success": "`✅` Ce channel a bien été oublié de mes magnifiques bases de données :>\n-# *Plus aucune poule viendra vous embêter ici promis...*"
+    },
+    "chickens": {
+        "noGuildId": "Cette commande doit être exécutée dans un serveur...",
+        "noChickens": "Vous n'avez pas encore de poule...\nAttendez qu'une poule apparaîsse dans le channel dédié et écrivez \"ckn\" pour la capturer :)",
+        "noChickensOther": "**{{username}}** n'a pas encore de poule...",
+        "tryToSteal": "Tu ne peux pas voler les oeufs de tes camarades...\n-# (Pas encore... ça reste entre nous)"
+    },
+    "pass": {
+        "noGuildId": "J'ai l'impression que t'essayes de m'arnaquer mais j'ai pas de preuves...\n-# *Retente dans un vrai channel textuel stp*",
+        "getXp": "Récupérer l'XP",
+        "dailyQuestsTitle": "Quêtes quotidiennes",
+        "weeklyQuestsTitle": "Quêtes hebdomadaires"
     }
 }

@@ -1,6 +1,7 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ContainerBuilder } from "discord.js";
 import ChickensState from "./Chickens.state";
 import { CollectedEggs } from "../../services/Chicken.service";
+import { getProgressBar } from "../../utils";
 
 export default function getChickensComponents(state: ChickensState) {
     // Calcul de la valeur totale de l'inventaire
@@ -83,14 +84,6 @@ export function getEggsComponent(collectedEggs: CollectedEggs) {
     }
 
     return container
-}
-
-function getProgressBar(current: number, max: number) {
-    const totalSquares = 10
-    const fullSquares = Math.floor(totalSquares * current / max) 
-    const emptySquares = totalSquares - fullSquares
-
-    return '▰'.repeat(fullSquares) + '▱'.repeat(emptySquares)
 }
 
 function formatTimeRemaining(remainingMs: number): string {

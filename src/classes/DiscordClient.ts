@@ -1,5 +1,4 @@
 import { ChatInputCommandInteraction, Client, Collection, GatewayIntentBits, PermissionFlagsBits } from "discord.js";
-
 import Command from "./Command";
 import CustomPrismaClient from "./CustomPrismaClient";
 import ChickenService from "../services/Chicken.service";
@@ -9,6 +8,7 @@ import Event from "./Event";
 import RegisteredChannelService from "../services/RegisteredChannels.service";
 import MessageService from "../services/Message.service";
 import SpawnService from "../services/Spawn.service";
+import QuestsService from "../services/Quests.service";
 
 export default class DiscordClient extends Client {
     commands: Collection<string, Command> = new Collection()
@@ -18,7 +18,8 @@ export default class DiscordClient extends Client {
         chicken: ChickenService
         registeredChannel: RegisteredChannelService
         message: MessageService,
-        spawn: SpawnService
+        spawn: SpawnService,
+        quests: QuestsService
     }
 
     chickenSpawnScheduler: ChickenSpawnScheduler
@@ -37,7 +38,8 @@ export default class DiscordClient extends Client {
             chicken: new ChickenService(this),
             registeredChannel: new RegisteredChannelService(this),
             message: new MessageService(this),
-            spawn: new SpawnService(this)
+            spawn: new SpawnService(this),
+            quests: new QuestsService(this)
         }
 
         this.chickenSpawnScheduler = new ChickenSpawnScheduler(this)
@@ -49,7 +51,7 @@ export default class DiscordClient extends Client {
     loadCommands() {
         readFilesAndForEach('commands', (filePath) => {
             const commandClass = require(filePath).default
-            if (!(commandClass.prototype instanceof Command)) return
+            if (!(commandClass?.prototype instanceof Command)) return
             
             const command = new commandClass()
             if (command instanceof Command) {
@@ -64,7 +66,7 @@ export default class DiscordClient extends Client {
     loadEvents() {
         readFilesAndForEach('events', (filePath) => {
             const eventClass = require(filePath).default
-            if (!(eventClass.prototype instanceof Event)) return
+            if (!(eventClass?.prototype instanceof Event)) return
 
             const event = new eventClass()
             if (event instanceof Event) {

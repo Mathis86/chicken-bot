@@ -46,3 +46,29 @@ model UserChickens {
 
   @@unique([userDiscordId, guildId, chickenId])
 }
+
+model Quests {
+  id            Int            @id
+  descriptionFr String
+  descriptionEn String
+  xp            Int
+  target        Int
+  frequency     QuestFrequency
+  userQuests    UserQuests[]
+}
+
+model UserQuests {
+  id            BigInt @id @default(autoincrement())
+  userDiscordId String
+  guildId       String
+  quest         Quests @relation(fields: [questId], references: [id])
+  questId       Int
+  progression   Int    @default(0)
+
+  @@unique([userDiscordId, guildId, questId])
+}
+
+enum QuestFrequency {
+  DAILY
+  WEEKLY
+}
